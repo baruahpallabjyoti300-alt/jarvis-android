@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<title>J.A.R.V.I.S — Android Assistant</title>
+<style>
+:root{--cyan:#54d9ff;--blue:#1676ff;--bg:#050b14;--panel:#0b1a2b;--muted:#9ab0c7}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 18%,#102d4b 0,#07111f 42%,#03070d 100%);color:#eef8ff;font:16px system-ui,sans-serif;min-height:100vh}
+main{max-width:520px;margin:auto;padding:24px 18px 40px}
+header{text-align:center;margin:12px 0 24px}.eyebrow{letter-spacing:5px;color:var(--cyan);font-size:11px}
+h1{font-size:32px;letter-spacing:7px;margin:8px 0 4px;text-shadow:0 0 22px #28bfff}
+.sub{color:var(--muted);font-size:12px;letter-spacing:2px}
+.core{width:190px;height:190px;border:2px solid #42cfff;border-radius:50%;margin:28px auto;display:grid;place-items:center;position:relative;box-shadow:0 0 24px #147dc966,inset 0 0 28px #147dc944}
+.core:before,.core:after{content:"";position:absolute;border:1px solid #3bbfff88;border-radius:50%;inset:12px}.core:after{inset:27px;border-style:dashed;animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mic{border:1px solid #58d9ff;background:#0b2942;color:white;border-radius:50%;width:88px;height:88px;font-size:30px;box-shadow:0 0 24px #21baff55;cursor:pointer}
+.status{text-align:center;color:var(--cyan);font-size:13px;min-height:22px}
+.panel{background:#0a1929dd;border:1px solid #1e5270;border-radius:18px;padding:16px;margin:16px 0;box-shadow:0 8px 30px #0005}
+label{font-size:12px;color:var(--muted)}.row{display:flex;gap:8px;margin-top:8px}
+input{min-width:0;flex:1;background:#06101c;border:1px solid #24516b;border-radius:10px;color:white;padding:12px;font-size:15px}
+button.action{background:#0d3450;border:1px solid #247ba0;color:#eafaff;border-radius:10px;padding:11px 14px;cursor:pointer}
+.apps{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.apps a{display:block;text-decoration:none;color:#eef8ff;text-align:center;background:#0c2033;border:1px solid #205474;border-radius:13px;padding:15px 8px}
+.apps b{display:block;font-size:25px;margin-bottom:5px}.apps small{color:#9ab0c7}
+.note{font-size:12px;line-height:1.5;color:#9ab0c7}
+#reply{min-height:42px;line-height:1.45;color:#d9f5ff}
+footer{text-align:center;color:#68859e;font-size:11px;margin-top:24px}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">PERSONAL AI INTERFACE</div><h1>J.A.R.V.I.S</h1><div class="sub">JUST A RATHER VERY INTELLIGENT SYSTEM</div></header>
+<div class="core"><button class="mic" id="mic" aria-label="Start voice command">🎙️</button></div>
+<div class="status" id="status">SYSTEM READY · Tap the microphone</div>
+<section class="panel"><label for="command">TYPE A COMMAND</label><div class="row"><input id="command" placeholder="Try: open YouTube"><button class="action" id="run">Run</button></div><p id="reply">Hello. I can open supported apps and speak simple responses.</p></section>
+<section class="panel"><label>QUICK LAUNCH</label><div class="apps">
+<a href="https://www.instagram.com/"><b>◎</b>Instagram<small>Open app / website</small></a>
+<a href="https://wa.me/"><b>☏</b>WhatsApp<small>Open chat chooser</small></a>
+<a href="https://www.youtube.com/"><b>▶</b>YouTube<small>Open app / website</small></a>
+<a href="https://www.google.com/"><b>◉</b>Google<small>Google app / search</small></a>
+</div></section>
+<section class="panel"><label>VOICE COMMANDS TO TRY</label><p class="note">“Open Instagram” · “Open WhatsApp” · “Open YouTube” · “Open Google” · “What can you do?”</p></section>
+<p class="note">Prototype 1: voice recognition depends on browser support and microphone permission. App links may open the installed app or a website. This starter does not read private messages, control accounts, or send anything automatically.</p>
+<footer>J.A.R.V.I.S · ANDROID STARTER PROTOTYPE</footer>
+</main>
+<script>
+const statusEl=document.getElementById('status'), reply=document.getElementById('reply'), input=document.getElementById('command');
+function speak(t){if('speechSynthesis'in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='hi-IN';speechSynthesis.speak(u)}}
+function runCommand(raw){
+ const c=raw.toLowerCase().trim(); if(!c)return;
+ input.value=raw;
+ let target=null, answer='';
+ if(c.includes('instagram')){target='https://www.instagram.com/';answer='Opening Instagram.'}
+ else if(c.includes('whatsapp')){target='https://wa.me/';answer='Opening WhatsApp.'}
+ else if(c.includes('youtube')){target='https://www.youtube.com/';answer='Opening YouTube.'}
+ else if(c.includes('google')){target='https://www.google.com/';answer='Opening Google.'}
+ else if(c.includes('what can you do')||c.includes('क्या कर')){answer='मैं Instagram, WhatsApp, YouTube और Google खोल सकता हूँ। अभी मैं शुरुआती प्रोटोटाइप हूँ।'}
+ else {answer='यह कमांड अभी उपलब्ध नहीं है। Instagram, WhatsApp, YouTube या Google खोलकर देखें।'}
+ reply.textContent=answer; speak(answer);
+ if(target)setTimeout(()=>location.href=target,450);
+}
+document.getElementById('run').addEventListener('click',()=>runCommand(input.value));
+input.addEventListener('keydown',e=>{if(e.key==='Enter')runCommand(input.value)});
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+document.getElementById('mic').addEventListener('click',()=>{
+ if(!SpeechRecognition){statusEl.textContent='VOICE INPUT NOT SUPPORTED · Type a command below';return}
+ const r=new SpeechRecognition();r.lang='hi-IN';r.interimResults=false;r.maxAlternatives=1;
+ statusEl.textContent='LISTENING…';r.onresult=e=>{let t=e.results[0][0].transcript;statusEl.textContent='COMMAND RECEIVED';runCommand(t)};
+ r.onerror=()=>statusEl.textContent='MIC ERROR · Check browser permission';
+ r.onend=()=>{if(statusEl.textContent==='LISTENING…')statusEl.textContent='SYSTEM READY'};
+ r.start();
+});
+</script>
+</body></html>
